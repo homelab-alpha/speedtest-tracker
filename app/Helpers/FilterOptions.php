@@ -5,21 +5,29 @@ namespace App\Helpers;
 class FilterOptions
 {
     public const TIME_RANGES = [
-        '1h'   => 'Last hour',
-        '12h'  => 'Last 12h',
-        '24h'  => 'Last 24h',
-        'week' => 'Last week',
-        'month'=> 'Last month',
+        '15m'   => 'Last 15 minutes',
+        '30m'   => 'Last 30 minutes',
+        '1h'    => 'Last hour',
+        '3h'    => 'Last 3 hours',
+        '6h'    => 'Last 6 hours',
+        '12h'   => 'Last 12 hours',
+        '24h'   => 'Last 24 hours',
+        'week'  => 'Last week',
+        'month' => 'Last month',
     ];
 
     public static function getStartDate(?string $filter): ?\Carbon\Carbon
     {
         return match ($filter) {
-            '1h'   => now()->subHour(),
-            '12h'  => now()->subHours(12),
-            '24h'  => now()->subDay(),
-            'week' => now()->subWeek(),
-            'month'=> now()->subMonth(),
+            '15m'   => now()->subMinutes(15),
+            '30m'   => now()->subMinutes(30),
+            '1h'    => now()->subHour(),
+            '3h'    => now()->subHours(3),
+            '6h'    => now()->subHours(6),
+            '12h'   => now()->subHours(12),
+            '24h'   => now()->subDay(),
+            'week'  => now()->subWeek(),
+            'month' => now()->subMonth(),
             default => null,
         };
     }
