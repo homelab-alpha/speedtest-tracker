@@ -8,9 +8,9 @@ use Filament\Widgets\ChartWidget;
 abstract class BaseFilterWidget extends ChartWidget
 {
     protected int|string|array $columnSpan = 'full';
-    protected static ?string $maxHeight = '250px';
+    protected static ?string $maxHeight = '350px';
     protected static ?string $pollingInterval = '60s';
-    public ?string $filter = '24h';
+    public ?string $filter = '12h';
 
     protected function getFilters(): ?array
     {
