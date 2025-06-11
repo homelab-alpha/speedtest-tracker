@@ -4,10 +4,9 @@ namespace App\Filament\Widgets;
 
 use App\Enums\ResultStatus;
 use App\Helpers\Average;
-use App\Helpers\FilterOptions;
 use App\Models\Result;
 
-class RecentPingChartWidget extends BaseFilterWidget
+class RecentPingChartWidget extends ChartWidgetTemplate
 {
     protected static ?string $heading = 'Ping (ms)';
 
@@ -17,7 +16,7 @@ class RecentPingChartWidget extends BaseFilterWidget
             ->select(['id', 'ping', 'created_at'])
             ->where('status', '=', ResultStatus::Completed)
             ->when(
-                $start = FilterOptions::getStartDate($this->filter),
+                $start = static::getStartDate($this->filter),
                 fn($query) => $query->where('created_at', '>=', $start)
             )
             ->orderBy('created_at')

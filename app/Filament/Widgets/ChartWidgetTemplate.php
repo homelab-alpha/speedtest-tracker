@@ -1,9 +1,16 @@
 <?php
 
-namespace App\Helpers;
+namespace App\Filament\Widgets;
 
-class FilterOptions
+use Filament\Widgets\ChartWidget;
+
+abstract class ChartWidgetTemplate extends ChartWidget
 {
+    protected int|string|array $columnSpan = 'full';
+    protected static ?string $maxHeight = '350px';
+    protected static ?string $pollingInterval = '60s';
+    public ?string $filter = '24h';
+
     public const TIME_RANGES = [
         '15m'   => 'Last 15 minutes',
         '30m'   => 'Last 30 minutes',
@@ -15,6 +22,11 @@ class FilterOptions
         'week'  => 'Last week',
         'month' => 'Last month',
     ];
+
+    protected function getFilters(): ?array
+    {
+        return static::TIME_RANGES;
+    }
 
     public static function getStartDate(?string $filter): ?\Carbon\Carbon
     {

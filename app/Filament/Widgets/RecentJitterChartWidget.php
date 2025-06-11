@@ -3,10 +3,9 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\ResultStatus;
-use App\Helpers\FilterOptions;
 use App\Models\Result;
 
-class RecentJitterChartWidget extends BaseFilterWidget
+class RecentJitterChartWidget extends ChartWidgetTemplate
 {
     protected static ?string $heading = 'Jitter';
 
@@ -16,7 +15,7 @@ class RecentJitterChartWidget extends BaseFilterWidget
             ->select(['id', 'data', 'created_at'])
             ->where('status', '=', ResultStatus::Completed)
             ->when(
-                $start = FilterOptions::getStartDate($this->filter),
+                $start = static::getStartDate($this->filter),
                 fn($query) => $query->where('created_at', '>=', $start)
             )
             ->orderBy('created_at')
