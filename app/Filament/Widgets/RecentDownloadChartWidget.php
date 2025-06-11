@@ -4,45 +4,23 @@ namespace App\Filament\Widgets;
 
 use App\Enums\ResultStatus;
 use App\Helpers\Average;
+use App\Helpers\FilterOptions;
 use App\Helpers\Number;
 use App\Models\Result;
-use Filament\Widgets\ChartWidget;
 
-class RecentDownloadChartWidget extends ChartWidget
+class RecentDownloadChartWidget extends BaseFilterWidget
 {
     protected static ?string $heading = 'Download (Mbps)';
-
-    protected int|string|array $columnSpan = 'full';
-
-    protected static ?string $maxHeight = '250px';
-
-    protected static ?string $pollingInterval = '60s';
-
-    public ?string $filter = '24h';
-
-    protected function getFilters(): ?array
-    {
-        return [
-            '24h' => 'Last 24h',
-            'week' => 'Last week',
-            'month' => 'Last month',
-        ];
-    }
 
     protected function getData(): array
     {
         $results = Result::query()
             ->select(['id', 'download', 'created_at'])
             ->where('status', '=', ResultStatus::Completed)
-            ->when($this->filter == '24h', function ($query) {
-                $query->where('created_at', '>=', now()->subDay());
-            })
-            ->when($this->filter == 'week', function ($query) {
-                $query->where('created_at', '>=', now()->subWeek());
-            })
-            ->when($this->filter == 'month', function ($query) {
-                $query->where('created_at', '>=', now()->subMonth());
-            })
+            ->when(
+                $start = FilterOptions::getStartDate($this->filter),
+                fn($query) => $query->where('created_at', '>=', $start)
+            )
             ->orderBy('created_at')
             ->get();
 
