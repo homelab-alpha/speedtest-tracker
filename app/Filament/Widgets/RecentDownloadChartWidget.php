@@ -25,25 +25,58 @@ class RecentDownloadChartWidget extends ChartWidget
 
     public function mount(): void
     {
-        $this->filter = $this->filter ?? config('speedtest.default_chart_range', '24h');
+        config(['speedtest.default_chart_range' => '12h']);
+
+        $this->filter = $this->filter ?? config('speedtest.default_chart_range');
     }
 
     protected function getData(): array
     {
+        $timeFilters = [
+            // Minutes
+            '1m'   => now()->subMinute(),
+            '2m'   => now()->subMinutes(2),
+            '3m'   => now()->subMinutes(3),
+            '4m'   => now()->subMinutes(4),
+            '5m'   => now()->subMinutes(5),
+            '10m'  => now()->subMinutes(10),
+            '15m'  => now()->subMinutes(15),
+            '30m'  => now()->subMinutes(30),
+            '45m'  => now()->subMinutes(45),
+
+            // Hours
+            '1h'   => now()->subHour(),
+            '2h'   => now()->subHours(2),
+            '3h'   => now()->subHours(3),
+            '6h'   => now()->subHours(6),
+            '12h'  => now()->subHours(12),
+            '24h'  => now()->subDay(),
+            '36h'  => now()->subHours(36),
+            '48h'  => now()->subHours(48),
+            '72h'  => now()->subHours(72),
+
+            // Days
+            '5d'   => now()->subDays(5),
+            '7d'   => now()->subDays(7),
+            '14d'  => now()->subDays(14),
+            '28d'  => now()->subDays(28),
+            '31d'  => now()->subDays(31),
+            '45d'  => now()->subDays(45),
+            '60d'  => now()->subDays(60),
+            '90d'  => now()->subDays(90),
+            '100d' => now()->subDays(100),
+        ];
+
         $results = Result::query()
             ->select(['id', 'download', 'created_at'])
-            ->where('status', '=', ResultStatus::Completed)
-            ->when($this->filter == '24h', function ($query) {
-                $query->where('created_at', '>=', now()->subDay());
-            })
-            ->when($this->filter == 'week', function ($query) {
-                $query->where('created_at', '>=', now()->subWeek());
-            })
-            ->when($this->filter == 'month', function ($query) {
-                $query->where('created_at', '>=', now()->subMonth());
-            })
+            ->where('status', ResultStatus::Completed)
+            ->when(
+                isset($timeFilters[$this->filter]),
+                fn($query) => $query->where('created_at', '>=', $timeFilters[$this->filter])
+            )
             ->orderBy('created_at')
             ->get();
+
 
         return [
             'datasets' => [
